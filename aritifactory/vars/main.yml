@@ -1,0 +1,10 @@
+---
+artifactory_version: artifactory-oss-6.11.1
+artifactory_dir: /opt/{{ artifactory_version }}
+artifactory_file: /opt/artifactory-oss-6.11.1
+artifactory_zip_url: http://dl.bintray.com/content/jfrog/artifactory/jfrog-{{ artifactory_zip_file }}
+database_type: postgresql
+database_user: artifactory
+database_pass: XMqwbvSJvY
+artifactory_dest: /opt/artifactory-oss-6.11.1.zip
+destination_path: /opt/

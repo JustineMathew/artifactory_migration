@@ -1,0 +1,4 @@
+---
+# tasks file for aritifactory
+- include_tasks: install.yml
+- include_tasks: datbase.yml

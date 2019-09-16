@@ -1,0 +1,4 @@
+- name: "Adding database properties file"
+  template:
+   src: db_properties.j2
+   dest: /opt/artifactory-oss-6.11.1/etc/db.properties

@@ -1,0 +1,78 @@
+---
+
+- name: check if "{{ package }}" is installed
+  yum:
+    list="{{ packages }}"
+  register: is_installed
+  vars:
+    packages:
+    - unzip
+    - net-tools
+    - java-1.8.0-openjdk
+    - java-1.8.0-openjdk-devel
+  tags:
+    - artifactory
+
+#- name: Check packages are installed or not
+#  shell: find /usr/bin/ -iname java
+# register: check_java
+#  ignore_errors: True
+
+
+- name: Install artifactory dependencies
+  yum:
+    name: "{{ packages }}"
+    state: installed
+  when:  is_installed.results | selectattr("yumstate", "match", "installed") | list | length == 0
+  vars:
+    packages:
+    - unzip
+    - net-tools
+    - java-1.8.0-openjdk
+    - java-1.8.0-openjdk-devel
+  tags:
+    - artifactory
+
+- name: Checking whether artifactory is downloaded
+  stat: path=/opt/jfrog-artifactory-oss-6.11.1.zip
+  register:  art_download
+
+- name: Download artifactory zip
+  get_url:
+     url: "{{ artifactory_zip_url }}"
+     dest: "{{ destination_path }}"
+  when: art_download.stat.exists == False
+  tags:
+    - artifactory
+
+- name: Checking whether artifactory is downloaded
+  stat: path="{{ artifactory_file }}"
+  register:  art_unarchive
+
+- name: Unarchive artifactory zip
+  unarchive:
+     src:  "{{ artifactory_dest }}" 
+     dest: "{{ destination_path }}"
+     remote_src: yes
+  run_once: true
+  when: art_unarchive.stat.exists == False
+  tags:
+    - artifactory
+
+- name: Checking whether artifactory is installed or not
+  stat: path=/etc/systemd/system/artifactory.service
+  register: service_install
+
+
+- name: Install service
+  shell: bash {{ artifactory_dir }}/bin/installService.sh
+  tags:
+    - artifactory
+  when: service_install.stat.exists == False
+
+- name: Start/Restart artifactory
+  service:
+    name: artifactory
+    state: started
+  tags:
+    - artifactory
